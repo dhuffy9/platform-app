@@ -42,8 +42,8 @@ app.get("/test-db", async (req, res) => {
 
 app.get("/users", async (req, res) => {
     try {
-        const [rows] = await db.query("SELECT uid, username, email, display_name, timestamp FROM users");
-        res.json(rows);
+        const [result] = await db.query("SELECT uid, username, email, display_name, timestamp FROM users");
+        res.json(result);
     } catch (error) {
         console.error("Users query error:", error);
         res.status(500).json({
@@ -59,7 +59,8 @@ app.post("/api/register", async (req, res) => {
 
         if (!username || !password) {
             return res.status(400).json({
-                message: "Username and password are required"
+                message: "Username and password are required",
+                type: "danger"
             });
         }
 
@@ -79,12 +80,23 @@ app.post("/api/register", async (req, res) => {
         console.error("Register error:", error);
 
         res.status(500).json({
-            message: "Failed to register user",
+            message: "Failed to register user (database)",
             type: "danger",
             error: error.message
         });
     }
 });
+
+app.post("/api/check-availability", async (req, res) => {
+    console.log("/api/check-availability")
+    const { field, value} = req.body;
+
+    // ?? for column name
+    const [result] = await db.query("SELECT 1 FROM users WHERE ?? = ? LIMIT 1", [ field , value])
+    console.log(result)
+
+    res.json({ taken: result.length > 0, field})
+})
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
