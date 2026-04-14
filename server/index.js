@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+//app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 5000;
@@ -53,7 +53,7 @@ app.get("/users", async (req, res) => {
     }
 });
 
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
     try {
         const { username, password, email, displayName } = req.body;
 

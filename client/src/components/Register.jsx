@@ -22,7 +22,7 @@ export default function Register() {
 
         setMessage("");
 
-        fetch("http://localhost:5000/register", {
+        fetch("/api/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -62,7 +62,8 @@ export default function Register() {
         }));
 
         if (name === "username" || name === "email"){
-            setAvailability((prev) => {
+            console.log(value)
+            setAvailability((prev) => ({
                 ...prev,
                 [name]: ""
             }));
