@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function Register() {
     const [message, setMessage] = useState({ type: "", message: ""});
@@ -69,6 +69,17 @@ export default function Register() {
             }));
         }
     }
+
+    const preAvailability =  useRef({ username: '', email: '' })
+
+    useEffect(() => {
+        // if both inputs are empty dont create a request 
+        if (!formData.username && !formData.email )  return
+
+        fetch("/api/check-availability", {
+
+        });
+    }, [formData.username, formData.email])
     return (
         <div style={{ maxWidth: "700px"}} className="container py-5 min-vh-100">
             <p className="h2 mb-3 text-center">
