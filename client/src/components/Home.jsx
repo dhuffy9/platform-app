@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 export default function Home() {
     return (
         <div className="container py-5">
@@ -16,13 +18,13 @@ export default function Home() {
                 </p>
 
                 <div className="d-flex justify-content-center gap-3 flex-wrap">
-                    <a className="btn btn-primary px-4 py-2 fw-semibold" href="#">
+                    <Link className="btn btn-primary px-4 py-2 fw-semibold" to="/register">
                         Sign Up
-                    </a>
+                    </Link>
 
-                    <a className="btn btn-outline-dark px-4 py-2 fw-semibold" href="#">
+                    <Link className="btn btn-outline-dark px-4 py-2 fw-semibold" to="/login">
                         Login
-                    </a>
+                    </Link>
                 </div>
             </div>
 
