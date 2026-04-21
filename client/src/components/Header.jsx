@@ -17,6 +17,10 @@ export default function Header() {
                             Home
                         </Link>
 
+                        <Link className="nav-link text-dark fw-semibold" to="/about">
+                            About
+                        </Link>
+
                         <Link className="nav-link text-dark fw-semibold" to="/register">
                             Sign Up
                         </Link>

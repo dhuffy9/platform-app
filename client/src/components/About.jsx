@@ -16,16 +16,6 @@ export default function Home() {
                     Users can create accounts, log in securely, manage content, and interact with
                     posts in a clean modern interface.
                 </p>
-
-                <div className="d-flex justify-content-center gap-3 flex-wrap">
-                    <Link className="btn btn-primary px-4 py-2 fw-semibold" to="/register">
-                        Sign Up
-                    </Link>
-
-                    <Link className="btn btn-outline-dark px-4 py-2 fw-semibold" to="/login">
-                        Login
-                    </Link>
-                </div>
             </div>
 
             <div className="row g-4 mb-5">

@@ -2,10 +2,26 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mysql = require("mysql2/promise");
+const session = require('express-session');
 
 dotenv.config();
 
 const app = express();
+
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: false,
+    cookie: function(req) {
+      var match = req.url.match(/^\/([^/]+)/);
+      return {
+        path: match ? '/' + match[1] : '/',
+        httpOnly: true,
+        secure: req.secure || false,
+        maxAge: 60000
+      }
+    }
+  }))
 
 //app.use(cors());
 app.use(express.json());
@@ -108,6 +124,11 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
+        req.session.user = {
+            id: user.id,
+            username: username
+        }
+
         res.json({
             type: "success",
             message: "Login successful",
@@ -125,6 +146,27 @@ app.post("/api/login", async (req, res) => {
             message: "Failed to login"
         });
     }
+});
+
+app.get("/api/user", async (req, res) => {
+    if(!req.session.user){
+        return res.status(401).json({
+            type: "danger",
+            message: "Please log in first"
+        });
+    }
+
+    const username = req.session.user.username;
+    console.log(username)
+
+    const [result] = await db.query(
+        "SELECT * FROM users WHERE username = ? LIMIT 1",
+        [username]
+    )
+
+    res.json({
+        data: result[0]
+    })
 });
 
 app.listen(PORT, () => {
