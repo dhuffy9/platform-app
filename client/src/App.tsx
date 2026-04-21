@@ -4,6 +4,7 @@ import About from "./components/About";
 import Register from  "./components/Register";
 import Login from  "./components/Login";
 import Posts from "./components/Posts";
+import User from "./components/User"
 
 function App() {
   
@@ -15,6 +16,7 @@ function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/user" element={<User />} />
         </Routes>
       </>
     );

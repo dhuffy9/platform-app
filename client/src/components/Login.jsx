@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [message, setMessage] = useState({ type: "", message: "" });
@@ -7,6 +8,8 @@ export default function Login() {
         username: "",
         password: ""
     });
+
+    const navigate = useNavigate();
 
     function handleChange(event) {
         const { name, value } = event.target;
@@ -27,6 +30,7 @@ export default function Login() {
             headers: {
                 "Content-Type": "application/json"
             },
+            credentials: "include",credentials: "include",
             body: JSON.stringify(formData)
         })
             .then(async (response) => {
@@ -45,6 +49,8 @@ export default function Login() {
                     username: "",
                     password: ""
                 });
+
+                navigate("/user")
             })
             .catch((err) => {
                 setMessage({
