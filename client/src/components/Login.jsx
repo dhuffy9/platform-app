@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Login() {
+export default function Login({ setUser }) {
     const [message, setMessage] = useState({ type: "", message: "" });
 
     const [formData, setFormData] = useState({
@@ -20,44 +20,57 @@ export default function Login() {
         }));
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
 
         setMessage({ type: "", message: "" });
 
-        fetch("/api/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",credentials: "include",
-            body: JSON.stringify(formData)
-        })
-            .then(async (response) => {
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || "Failed to login");
-                }
-
-                setMessage({
-                    type: data.type || "success",
-                    message: data.message || "Login successful"
-                });
-
-                setFormData({
-                    username: "",
-                    password: ""
-                });
-
-                navigate("/user")
-            })
-            .catch((err) => {
-                setMessage({
-                    type: "danger",
-                    message: err.message
-                });
+        try {
+            const response = await fetch("/api/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                credentials: "include",
+                body: JSON.stringify(formData)
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to login");
+            }
+
+            const userResponse = await fetch("/api/user", {
+                method: "GET",
+                credentials: "include"
+            });
+
+            const userData = await userResponse.json();
+
+            if (!userResponse.ok) {
+                throw new Error(userData.message || "Failed to get user");
+            }
+
+            setUser(userData.user);
+
+            setMessage({
+                type: data.type || "success",
+                message: data.message || "Login successful"
+            });
+
+            setFormData({
+                username: "",
+                password: ""
+            });
+
+            navigate("/user");
+        } catch (err) {
+            setMessage({
+                type: "danger",
+                message: err.message
+            });
+        }
     }
 
     return (
