@@ -39,6 +39,17 @@ app.get("/", (req, res) => {
     res.send("API is running");
 });
 
+function requireLogin(req, res, next) {
+    if (!req.session.user) {
+        return res.status(401).json({
+            type: "danger",
+            message: "Please log in first"
+        });
+    }
+
+    next();
+}
+
 
 app.post("/api/register", async (req, res) => {
     try {
@@ -75,15 +86,43 @@ app.post("/api/register", async (req, res) => {
 });
 
 app.post("/api/check-availability", async (req, res) => {
-    console.log("/api/check-availability")
-    const { field, value} = req.body;
+    try {
+        const { field, value } = req.body;
 
-    // ?? for column name
-    const [result] = await db.query("SELECT 1 FROM users WHERE ?? = ? LIMIT 1", [ field , value])
-    //console.log(result)
+        const allowedFields = ["username", "email"];
 
-    res.json({ taken: result.length > 0, field})
-})
+        if (!allowedFields.includes(field)) {
+            return res.status(400).json({
+                type: "danger",
+                message: "Invalid field"
+            });
+        }
+
+        if (!value || !value.trim()) {
+            return res.status(400).json({
+                type: "danger",
+                message: "Value is required"
+            });
+        }
+
+        const [result] = await db.query(
+            `SELECT 1 FROM users WHERE ${field} = ? LIMIT 1`,
+            [value.trim()]
+        );
+
+        res.json({
+            taken: result.length > 0,
+            field
+        });
+    } catch (error) {
+        console.error("Availability error:", error);
+
+        res.status(500).json({
+            type: "danger",
+            message: "Failed to check availability"
+        });
+    }
+});
 
 
 const bcrypt = require("bcrypt");
@@ -320,13 +359,33 @@ app.get("/api/my-posts", async (req, res) => {
 })
 
 app.get("/api/posts", async (req, res) => {
-    const [posts] = await db.query(`SELECT * FROM posts
-        INNER JOIN users ON users.uid = posts.owner`)
+    try {
+        const [posts] = await db.query(`
+            SELECT 
+                posts.pid,
+                posts.owner,
+                posts.title,
+                posts.body,
+                posts.timestamp,
+                users.uid,
+                users.username,
+                users.display_name
+            FROM posts
+            INNER JOIN users ON users.uid = posts.owner
+            ORDER BY posts.timestamp DESC
+        `);
 
-    console.log(posts)
+        res.json({ posts });
+    } catch (error) {
+        console.error("Get posts error:", error);
 
-    res.json({posts})
-})
+        res.status(500).json({
+            type: "danger",
+            message: "Failed to load posts"
+        });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
