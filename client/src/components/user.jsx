@@ -51,7 +51,6 @@ export default function User({ user, setUser }) {
         }
 
         
-        /*
         fetch("/api/my-posts")
             .then(async (response) => {
                 const data = await response.json();
@@ -60,7 +59,7 @@ export default function User({ user, setUser }) {
                     throw new Error(data.message || "Failed to get posts");
                 }
 
-                setPosts(data.post);
+                setPosts(data.posts);
             })
             .catch((err) => {
                 setMessage({
@@ -69,7 +68,6 @@ export default function User({ user, setUser }) {
                 });
             });
 
-        */
     }, [user, setUser, navigate]);
 
     function handlePostChange(event) {
@@ -95,7 +93,7 @@ export default function User({ user, setUser }) {
 
         setMessage({ type: "", message: "" });
 
-        /*
+    
 
         try {
             const response = await fetch("/api/posts", {
@@ -124,8 +122,8 @@ export default function User({ user, setUser }) {
 
                 throw new Error(data.message || "Failed to create post");
             }
-
-            setPosts((prev) => [data.data, ...prev]);
+             
+            setPosts((prev) => [data.post, ...prev]);
 
             setPostFormData({
                 title: "",
@@ -142,7 +140,6 @@ export default function User({ user, setUser }) {
                 message: err.message
             });
         }
-        */
     }
 
     async function handleAccountSubmit(event) {
@@ -230,12 +227,12 @@ export default function User({ user, setUser }) {
 
                         <div className="mb-3">
                             <label className="form-label text-muted mb-1">User ID</label>
-                            <div className="form-control bg-light">{user?.uid}</div>
+                            <div className="form-control bg-light opacity-50">{user?.uid}</div>
                         </div>
 
                         <div className="mb-3">
                             <label className="form-label text-muted mb-1">Username</label>
-                            <div className="form-control bg-light">{user?.username}</div>
+                            <div className="form-control bg-light opacity-50">{user?.username}</div>
                         </div>
 
                         <form onSubmit={handleAccountSubmit}>
@@ -347,7 +344,7 @@ export default function User({ user, setUser }) {
                                 <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
                                     <h5 className="fw-semibold mb-0">{post.title}</h5>
                                     <small className="text-muted">
-                                        {new Date(post.created_at).toLocaleString()}
+                                        {new Date(post.timestamp).toLocaleString()}
                                     </small>
                                 </div>
 

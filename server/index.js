@@ -80,7 +80,7 @@ app.post("/api/check-availability", async (req, res) => {
 
     // ?? for column name
     const [result] = await db.query("SELECT 1 FROM users WHERE ?? = ? LIMIT 1", [ field , value])
-    console.log(result)
+    //console.log(result)
 
     res.json({ taken: result.length > 0, field})
 })
@@ -156,8 +156,6 @@ app.get("/api/user", async (req, res) => {
         "SELECT uid, username, email, display_name FROM users WHERE username = ? LIMIT 1",
         [username]
     )
-
-    console.log(result)
  
     res.json({
         user: result[0]
@@ -264,24 +262,28 @@ app.post("/api/posts", async (req, res) => {
         }
 
         const [result] = await db.query(
-            "INSERT INTO posts (user_uid, title, body) VALUES (?, ?, ?)",
+            "INSERT INTO posts (owner, title, body) VALUES (?, ?, ?)",
             [req.session.user.uid, cleanTitle, cleanBody]
         );
 
-        const [newPost] = await db.query(
-            `SELECT posts.pid, posts.title, posts.body, posts.created_at,
+
+        const [post] = await db.query(
+            `SELECT posts.pid, posts.owner, posts.title, posts.body, posts.timestamp,
                     users.uid, users.username, users.display_name
              FROM posts
-             INNER JOIN users ON users.uid = posts.user_uid
+             INNER JOIN users ON users.uid = posts.owner
              WHERE posts.pid = ?
              LIMIT 1`,
             [result.insertId]
         );
 
+        console.log(post[0]);
+    
+
         res.status(201).json({
             type: "success",
             message: "Post created successfully",
-            data: newPost[0]
+            post: post[0]
         });
     } catch (error) {
         console.error("Create post error:", error);
@@ -292,6 +294,39 @@ app.post("/api/posts", async (req, res) => {
     }
 });
 
+app.get("/api/my-posts", async (req, res) => {
+    if(!req.session.user){
+        return res.status(401).json({
+            type: "danger",
+            message: "Please log in first"
+        });
+    }
+
+    const username = req.session.user.username;
+
+    const [posts] = await db.query(
+        `SELECT posts.pid, posts.owner, posts.title, posts.body, posts.timestamp,
+                users.uid, users.username, users.display_name
+         FROM posts
+         INNER JOIN users ON users.uid = posts.owner
+         WHERE posts.owner = ?`,
+        [req.session.user.uid]
+    );
+
+    console.log(posts);
+ 
+    res.json({ posts})
+
+})
+
+app.get("/api/posts", async (req, res) => {
+    const [posts] = await db.query(`SELECT * FROM posts
+        INNER JOIN users ON users.uid = posts.owner`)
+
+    console.log(posts)
+
+    res.json({posts})
+})
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
